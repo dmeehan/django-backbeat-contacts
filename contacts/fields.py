@@ -1,5 +1,7 @@
 # contacts/fields.py
 
+from django.db import models
+
 # Country field. Based on: http://www.djangosnippets.org/snippets/1476/
 
 
