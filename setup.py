@@ -14,7 +14,7 @@ except (IOError, OSError):
 
 setup(
     name='django-backbeat-contacts',
-    version=categories.get_version(),
+    version=contacts.get_version(),
     description='A pluggable contact management app.',
     long_description=long_description,
     author='Douglas Meehan',
