@@ -30,7 +30,8 @@ class ContactBase(models.Model):
     )
 
     # core fields
-    contact_type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES)
+    contact_type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES,
+                                                    default=TYPE_PERSON)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     address_line1 = models.CharField(max_length=255, blank=True)
