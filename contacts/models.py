@@ -71,19 +71,20 @@ class ContactBase(models.Model):
     def render_markup(self):
         """Turns any markup into HTML"""
         original = self.description_html
-
         if CONTACT_MARKUP == 'markdown':
-            self.description_html = markup.markdown(self.description)
-        elif CONTACT_MARKUP == 'restructured_text':
-            self.description_html = markup.restructuredtext(self.description)
+            import markdown
+            self.description_html = markdown.markdown(self.description)
         elif CONTACT_MARKUP == 'textile':
-            self.description_html = markup.textile(self.description)
+            import textile
+            self.description_html = textile.textile(self.description)
         elif CONTACT_MARKUP == 'wysiwyg':
             self.description_html = self.description
         elif CONTACT_MARKUP == 'html':
             self.description_html = self.description
         else:
             self.description_html = strip_tags(self.description)
+
+        return self.description_html != original
 
     def save(self, force_insert=False, force_update=False):
         self.render_markup()
