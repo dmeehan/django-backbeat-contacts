@@ -94,4 +94,4 @@ class ContactBase(models.Model):
             self.last_name = names[-1]
             if len(names) == 3:
                 self.middle_name = names[1]
-        super(Affiliate, self).save(force_insert, force_update)
+        super(ContactBase, self).save(force_insert, force_update)
