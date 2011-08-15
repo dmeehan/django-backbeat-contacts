@@ -1,5 +1,6 @@
 # contacts/models.py
 
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import permalink
 
@@ -30,6 +31,7 @@ class ContactBase(models.Model):
     )
 
     # core fields
+    user = models.ForeignKey(User, blank=True, null=True)
     contact_type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES,
                                                     default=TYPE_PERSON)
     name = models.CharField(max_length=255)
