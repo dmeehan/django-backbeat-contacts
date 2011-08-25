@@ -1,19 +1,19 @@
 # contacts/models.py
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import permalink
 
 from contacts.fields import CountryField
-from contacts.managers import *
-from contacts.settings import CONTACT_MARKUP
+from contacts.managers import ContactManager
 
 class ContactBase(models.Model):
     """
-    
+
     Abstract contact model. Includes fields shared
     between all contact types.
-        
+
     """
     objects = ContactManager()
 
@@ -49,6 +49,7 @@ class ContactBase(models.Model):
     website = models.URLField(blank=True, verify_exists=True)
 
     # metadata
+    relation = models.CharField(max_length=255, editable=False, blank=True)
     slug = models.SlugField(unique=True,
                             help_text="Unique web title automatically generated from name.")
 
@@ -59,7 +60,7 @@ class ContactBase(models.Model):
 
     # Fields to store generated HTML.
     description_html = models.TextField(editable=False, blank=True)
-        
+
     class Meta:
         abstract = True
         ordering = ('contact_type', 'name',)
@@ -74,22 +75,26 @@ class ContactBase(models.Model):
     def render_markup(self):
         """Turns any markup into HTML"""
         original = self.description_html
-        if CONTACT_MARKUP == 'markdown':
+        if settings.CONTACT_MARKUP == 'markdown':
             import markdown
             self.description_html = markdown.markdown(self.description)
-        elif CONTACT_MARKUP == 'textile':
+        elif settings.CONTACT_MARKUP == 'textile':
             import textile
             self.description_html = textile.textile(self.description)
-        elif CONTACT_MARKUP == 'wysiwyg':
+        elif settings.CONTACT_MARKUP == 'wysiwyg':
             self.description_html = self.description
-        elif CONTACT_MARKUP == 'html':
+        elif settings.CONTACT_MARKUP == 'html':
             self.description_html = self.description
         else:
             self.description_html = strip_tags(self.description)
 
         return self.description_html != original
 
+    def set_relation(self):
+        pass
+
     def save(self, force_insert=False, force_update=False):
+        self.set_relation()
         self.render_markup()
         if self.contact_type == self.TYPE_PERSON:
             names = self.name.split()
@@ -98,3 +103,34 @@ class ContactBase(models.Model):
             if len(names) == 3:
                 self.middle_name = names[1]
         super(ContactBase, self).save(force_insert, force_update)
+
+class Contact(ContactBase):
+    pass
+
+class Client(Contact):
+    def set_relation(self):
+        self.relation = 'client'
+
+    class meta:
+        proxy = True
+
+class Collaborator(Contact):
+    def set_relation(self):
+        self.relation = 'collaborator'
+
+    class meta:
+        proxy = True
+
+class Supplier(Contact):
+    def set_relation(self):
+        self.relation = 'supplier'
+
+    class meta:
+        proxy = True
+
+class Customer(Contact):
+    def set_relation(self):
+        self.relation = 'customer'
+
+    class meta:
+        proxy = True
