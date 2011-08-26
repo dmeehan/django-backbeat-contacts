@@ -94,7 +94,8 @@ class ContactBase(models.Model):
         pass
 
     def save(self, force_insert=False, force_update=False):
-        self.set_relation()
+        if not self.relation:
+            self.set_relation()
         self.render_markup()
         if self.contact_type == self.TYPE_PERSON:
             names = self.name.split()
@@ -104,33 +105,4 @@ class ContactBase(models.Model):
                 self.middle_name = names[1]
         super(ContactBase, self).save(force_insert, force_update)
 
-class Contact(ContactBase):
-    pass
 
-class Client(Contact):
-    def set_relation(self):
-        self.relation = 'client'
-
-    class meta:
-        proxy = True
-
-class Collaborator(Contact):
-    def set_relation(self):
-        self.relation = 'collaborator'
-
-    class meta:
-        proxy = True
-
-class Supplier(Contact):
-    def set_relation(self):
-        self.relation = 'supplier'
-
-    class meta:
-        proxy = True
-
-class Customer(Contact):
-    def set_relation(self):
-        self.relation = 'customer'
-
-    class meta:
-        proxy = True
